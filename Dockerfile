@@ -11,14 +11,16 @@ LABEL maintainer="Johannes Tegnér <johannes@jitesoft.com>" \
 COPY ./nginx.tar.gz /tmp/nginx.tar.gz
 COPY entrypoint /usr/local/bin
 
+ENV PATH="/usr/local/nginx/sbin:${PATH}"
+
 RUN addgroup -g 1000 nginx \
  && adduser -u 1000 -G nginx -s /bin/sh -D nginx \
  && apk add --no-cache --virtual .build-deps openssl-dev pcre-dev zlib-dev build-base \
- && mkdir -p /tmp/nginx-src /var/log/nginx \
+ && mkdir -p /tmp/nginx-src /var/log/nginx /usr/local/nginx \
  && tar -xzf /tmp/nginx.tar.gz -C /tmp/nginx-src --strip-components=1 \
  && rm -f /tmp/nginx.tar.gz \
  && cd /tmp/nginx-src/ \
- && ./configure --with-http_ssl_module --with-http_gzip_static_module --user=nginx --group=nginx --error-log-path=/var/log/nginx --http-log-path=/var/log/nginx --prefix=/usr/local/bin \
+ && ./configure --with-http_ssl_module --with-http_gzip_static_module --user=nginx --group=nginx --error-log-path=/var/log/nginx --http-log-path=/var/log/nginx --prefix=/usr/local/nginx \
  && make -j2 \
  && make install \
  && apk del .build-deps \
