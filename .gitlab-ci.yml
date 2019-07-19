@@ -23,7 +23,7 @@ gpg:import:
           gpg --keyserver ha.pool.sks-keyservers.net --recv-keys "${key}";
         done
         gpg --export > keys.out
-        md5sum gpg-keys.txt | tee keysum.txt
+        md5sum pgpkeys.txt | tee keysum.txt
       fi
   cache:
     key: php.gpg.keyring
