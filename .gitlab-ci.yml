@@ -63,7 +63,8 @@ download:
       for VERSION in `cat versions.txt`; do
         curl -L https://nginx.org/download/nginx-${VERSION}.tar.gz -o nginx-${VERSION}.tar.gz
         curl -L https://nginx.org/download/nginx-${VERSION}.tar.gz.asc -o pgp.asc
-        gpg --verify pgp.asc nginx.tar.gz
+        gpg --verify pgp.asc nginx-${VERSION}.tar.gz
+        rm pgp.asc
       done
   artifacts:
     paths:
