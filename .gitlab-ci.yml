@@ -82,6 +82,7 @@ download:
   script:
     - echo ${CI_JOB_TOKEN} | docker login -u gitlab-ci-token registry.gitlab.com --password-stdin
     - echo ${DOCKER_HUB_PASSWORD} | docker login -u ${DOCKER_HUB_USER} --password-stdin
+    - mv nginx-${VERSION}.tar.gz nginx.tar.gz
     - docker build -t ${CI_REGISTRY_IMAGE}:${VERSION} --label "com.jitesoft.app.nginx.version=${VERSION}" .
     - TAGS="${TAGS} ${VERSION}"
     - |
