@@ -105,4 +105,4 @@ build:stable:
     - VERSION=$(awk '{print $2}' versions.txt)
   extends: .build
   variables:
-    TAGS: "latest mainline"
+    TAGS: "stable"
