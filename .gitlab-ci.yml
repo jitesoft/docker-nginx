@@ -1,5 +1,7 @@
-# https://nginx.org/download/nginx-${VERSION}.tar.gz
-# https://nginx.org/download/nginx-${VERSION}.tar.gz.asc
+stages:
+  - prebuild
+  - download
+  - build
 
 variables:
   VERSION: 1.17.1
@@ -37,6 +39,7 @@ gpg:import:
 
 
 download:
+  stage: download
   image: registry.gitlab.com/jitesoft/dockerfiles/alpine:latest
   dependencies:
     - gpg:import
