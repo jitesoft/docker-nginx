@@ -3,10 +3,22 @@ stages:
   - download
   - build
 
-#wget -qO- https://nginx.org/en/download.html | grep -oP '(?<=\<a href=\"/download/nginx\-)([0-9]{0,2}(\.?)){2}([0-9]{0,2})' | awk '{print $1}' | uniq | head -n2
+
 
 variables:
   VERSION: 1.17.1
+
+download:versions:
+  stage: prebuild
+  before_script:
+    - apk add --no-cache wget grep
+  script:
+    - VERSIONS=$(wget -qO- https://nginx.org/en/download.html | grep -oP '(?<=\<a href=\"/download/nginx\-)([0-9]{0,2}(\.?)){2}([0-9]{0,2})' | awk '{print $1}' | uniq | head -n2)
+    - echo -e ${VERSIONS} > versions.txt
+  artifacts:
+    paths:
+      - versions.txt
+    expire_in: 1 day
 
 gpg:import:
   image: registry.gitlab.com/jitesoft/dockerfiles/alpine:latest
@@ -46,26 +58,30 @@ download:
     - apk add --no-cache curl gnupg
   script:
     - gpg --import keys.out
-    - curl -L https://nginx.org/download/nginx-${VERSION}.tar.gz -o nginx.tar.gz
-    - curl -L https://nginx.org/download/nginx-${VERSION}.tar.gz.asc -o pgp.asc
-    - gpg --verify pgp.asc nginx.tar.gz
+    - |
+      for VERSION in `cat versions.txt`; do
+        curl -L https://nginx.org/download/nginx-${VERSION}.tar.gz -o nginx-${VERSION}.tar.gz
+        curl -L https://nginx.org/download/nginx-${VERSION}.tar.gz.asc -o pgp.asc
+        gpg --verify pgp.asc nginx.tar.gz
+      done
   artifacts:
     paths:
-      - nginx.tar.gz
+      - nginx-*.tar.gz
+      - versions.txt
     expire_in: 1 day
 
-build:
+.build:
   stage: build
   image: registry.gitlab.com/jitesoft/dockerfiles/docker:18.09.6
   dependencies:
     - download
   services:
     - registry.gitlab.com/jitesoft/dockerfiles/docker/dind:18.09.6
-  before_script:
+  script:
     - echo ${CI_JOB_TOKEN} | docker login -u gitlab-ci-token registry.gitlab.com --password-stdin
     - echo ${DOCKER_HUB_PASSWORD} | docker login -u ${DOCKER_HUB_USER} --password-stdin
-  script:
     - docker build ${CI_REGISTRY_IMAGE}:${VERSION} --label "com.jitesoft.app.nginx.version=${VERSION}" .
+    - TAGS="${TAGS} ${VERSION}"
     - |
       for tag in ${TAGS}; do
         docker tag ${CI_REGISTRY_IMAGE}:${VERSION} ${CI_REGISTRY_IMAGE}:${tag}
@@ -73,3 +89,17 @@ build:
         docker push ${CI_REGISTRY_IMAGE}:${tag}
         #docker push jitesoft/nginx:${tag}
       done
+
+build:mainline:
+  before_script:
+    - VERSION=$(awk '{print $1}' versions.txt)
+  extends: .build
+  variables:
+    TAGS: "latest mainline"
+
+build:stable:
+  before_script:
+    - VERSION=$(awk '{print $2}' versions.txt)
+  extends: .build
+  variables:
+    TAGS: "latest mainline"
