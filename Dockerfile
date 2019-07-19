@@ -9,14 +9,14 @@ LABEL maintainer="Johannes Tegnér <johannes@jitesoft.com>" \
       com.jitesoft.project.registry.uri="registry.gitlab.com/jitesoft/dockerfiles/php"
 
 COPY ./nginx.tar.gz /tmp/nginx.tar.gz
-COPY entrypoint /usr/local/bin
+COPY entrypoint /usr/local/bin/
 
 ENV PATH="/usr/local/nginx/sbin:${PATH}"
 
 RUN addgroup -g 1000 nginx \
  && adduser -u 1000 -G nginx -s /bin/sh -D nginx \
  && apk add --no-cache --virtual .build-deps build-base \
- && apk add --no-cache openssl-dev pcre-dev zlib-dev \
+ && apk add --no-cache openssl-dev pcre-dev zlib-dev ca-certificates \
  && mkdir -p /tmp/nginx-src /var/log/nginx /usr/local/nginx \
  && tar -xzf /tmp/nginx.tar.gz -C /tmp/nginx-src --strip-components=1 \
  && rm -f /tmp/nginx.tar.gz \
@@ -26,6 +26,9 @@ RUN addgroup -g 1000 nginx \
  && make install \
  && apk del .build-deps \
  && nginx -v
+
+EXPOSE 80
+EXPOSE 443
 
 ENTRYPOINT ["entrypoint"]
 CMD ["nginx", "-g", "daemon off;"]
