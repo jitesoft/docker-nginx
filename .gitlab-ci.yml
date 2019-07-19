@@ -3,6 +3,8 @@ stages:
   - download
   - build
 
+#wget -qO- https://nginx.org/en/download.html | grep -oP '(?<=\<a href=\"/download/nginx\-)([0-9]{0,2}(\.?)){2}([0-9]{0,2})' | awk '{print $1}' | uniq | head -n2
+
 variables:
   VERSION: 1.17.1
 
@@ -34,9 +36,6 @@ gpg:import:
     paths:
       - keys.out
     expire_in: 1 day
-  tags:
-    - jitesoft
-
 
 download:
   stage: download
@@ -47,7 +46,7 @@ download:
     - apk add --no-cache curl gnupg
   script:
     - gpg --import keys.out
-    - curl -L https://nginx.org/download/nginx-${VERSION}.tar.gz nginx.tar.gz
+    - curl -L https://nginx.org/download/nginx-${VERSION}.tar.gz -o nginx.tar.gz
     - curl -L https://nginx.org/download/nginx-${VERSION}.tar.gz.asc -o pgp.asc
     - gpg --verify pgp.asc nginx.tar.gz
   artifacts:
