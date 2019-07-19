@@ -18,7 +18,7 @@ RUN addgroup -g 1000 nginx \
  && tar -xzf /tmp/nginx.tar.gz -C /tmp/nginx-src --strip-components=1 \
  && rm -f /tmp/nginx.tar.gz \
  && cd /tmp/nginx-src/ \
- && ./configure --with-http_ssl_module --with-http_gzip_static_module --user=nginx --group=nginx --error-log-path=/var/log/nginx --http-log-path=/var/log/nginx --prefix=/etc/nginx \
+ && ./configure --with-http_ssl_module --with-http_gzip_static_module --user=nginx --group=nginx --error-log-path=/var/log/nginx --http-log-path=/var/log/nginx --prefix=/usr/local/bin \
  && make -j2 \
  && make install \
  && apk del .build-deps \
