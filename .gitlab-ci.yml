@@ -1,0 +1,73 @@
+# https://nginx.org/download/nginx-${VERSION}.tar.gz
+# https://nginx.org/download/nginx-${VERSION}.tar.gz.asc
+
+variables:
+  VERSION: 1.17.1
+
+gpg:import:
+  image: registry.gitlab.com/jitesoft/dockerfiles/alpine:latest
+  stage: prebuild
+  before_script:
+    - apk add --no-cache gnupg linux-headers
+  script:
+    - |
+      if [[ "$(cat keysum.txt | md5sum -c)" ]]
+      then
+        echo "Keys already imported."
+      else
+        for key in `cat pgpkeys.txt`; do
+          gpg --keyserver pgp.mit.edu --recv-keys "${key}" ||
+          gpg --keyserver keyserver.pgp.com --recv-keys "${key}" ||
+          gpg --keyserver ha.pool.sks-keyservers.net --recv-keys "${key}";
+        done
+        gpg --export > keys.out
+        md5sum gpg-keys.txt | tee keysum.txt
+      fi
+  cache:
+    key: php.gpg.keyring
+    paths:
+      - keys.out
+      - keysum.txt
+  artifacts:
+    paths:
+      - keys.out
+    expire_in: 1 day
+  tags:
+    - jitesoft
+
+
+download:
+  image: registry.gitlab.com/jitesoft/dockerfiles/alpine:latest
+  dependencies:
+    - gpg:import
+  before_script:
+    - apk add --no-cache curl gnupg
+  script:
+    - gpg --import keys.out
+    - curl -L https://nginx.org/download/nginx-${VERSION}.tar.gz nginx.tar.gz
+    - curl -L https://nginx.org/download/nginx-${VERSION}.tar.gz.asc -o pgp.asc
+    - gpg --verify pgp.asc nginx.tar.gz
+  artifacts:
+    paths:
+      - nginx.tar.gz
+    expire_in: 1 day
+
+build:
+  stage: build
+  image: registry.gitlab.com/jitesoft/dockerfiles/docker:18.09.6
+  dependencies:
+    - download
+  services:
+    - registry.gitlab.com/jitesoft/dockerfiles/docker/dind:18.09.6
+  before_script:
+    - echo ${CI_JOB_TOKEN} | docker login -u gitlab-ci-token registry.gitlab.com --password-stdin
+    - echo ${DOCKER_HUB_PASSWORD} | docker login -u ${DOCKER_HUB_USER} --password-stdin
+  script:
+    - docker build ${CI_REGISTRY_IMAGE}:${VERSION} --label "com.jitesoft.app.nginx.version=${VERSION}" .
+    - |
+      for tag in ${TAGS}; do
+        docker tag ${CI_REGISTRY_IMAGE}:${VERSION} ${CI_REGISTRY_IMAGE}:${tag}
+        #docker tag ${CI_REGISTRY_IMAGE}:${VERSION} jitesoft/nginx:${tag}
+        docker push ${CI_REGISTRY_IMAGE}:${tag}
+        #docker push jitesoft/nginx:${tag}
+      done
