@@ -1,12 +1,11 @@
-# -user -group -build=(name) --error-log-path=/var/log/nginx
 FROM registry.gitlab.com/jitesoft/dockerfiles/alpine:latest
 LABEL maintainer="Johannes Tegnér <johannes@jitesoft.com>" \
       maintainer.org="Jitesoft" \
       maintainer.org.uri="https://jitesoft.com" \
       com.jitesoft.project.repo.type="git" \
-      com.jitesoft.project.repo.uri="https://gitlab.com/jitesoft/dockerfiles/php" \
-      com.jitesoft.project.repo.issues="https://gitlab.com/jitesoft/dockerfiles/php/issues" \
-      com.jitesoft.project.registry.uri="registry.gitlab.com/jitesoft/dockerfiles/php"
+      com.jitesoft.project.repo.uri="https://gitlab.com/jitesoft/dockerfiles/nginx" \
+      com.jitesoft.project.repo.issues="https://gitlab.com/jitesoft/dockerfiles/nginx/issues" \
+      com.jitesoft.project.registry.uri="registry.gitlab.com/jitesoft/dockerfiles/nginx"
 
 COPY ./nginx.tar.gz /tmp/nginx.tar.gz
 COPY ./entrypoint /usr/local/bin/
@@ -49,7 +48,7 @@ RUN addgroup -g 1000 www-data \
  && cd / \
  && rm -rf /tmp/nginx-src \
  && apk del .build-deps \
- && apk add --no-cache --virtual .runtime-deps openssl pcre zlib libxml2 libxslt gd geoip perl ca-certificates \
+ && apk add --no-cache --virtual .runtime-deps openssl pcre zlib libxml2 libxslt gd geoip perl ca-certificates gettext \
  && chown -R www-data:www-data /usr/local/nginx \
  && chown -R www-data:www-data /usr/local/bin \
  && chmod +x /usr/local/bin/entrypoint \
@@ -57,7 +56,7 @@ RUN addgroup -g 1000 www-data \
 
 WORKDIR /usr/local/nginx/html
 COPY ./nginx.conf /etc/nginx.conf
-COPY ./default.conf /etc/nginx/conf.d/default.conf
+COPY ./default.template /usr/local/default.template
 EXPOSE 80
 VOLUME ["/etc/nginx/conf.d", "/usr/local/nginx/html"]
 ENTRYPOINT ["entrypoint"]
