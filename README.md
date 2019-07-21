@@ -44,4 +44,3 @@ Nginx is released under [2-clause BSD-like license](https://nginx.org/LICENSE).
 ## Image labels
 
 This image follows the [Jitesoft image label specification 1.0.0](https://gitlab.com/snippets/1866155).
-template
