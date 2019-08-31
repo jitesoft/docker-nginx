@@ -91,8 +91,10 @@ download:
       for tag in ${TAGS}; do
         docker tag ${CI_REGISTRY_IMAGE}:${VERSION} ${CI_REGISTRY_IMAGE}:${tag}
         docker tag ${CI_REGISTRY_IMAGE}:${VERSION} jitesoft/nginx:${tag}
+        docker tag ${CI_REGISTRY_IMAGE}:${VERSION} quay.io/jitesoft/nginx:${tag}
         docker push ${CI_REGISTRY_IMAGE}:${tag}
         docker push jitesoft/nginx:${tag}
+        docker push quay.io/jitesoft/nginx:${tag}
       done
 
 build:mainline:

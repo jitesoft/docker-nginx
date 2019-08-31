@@ -18,6 +18,12 @@ the latest mainline and latest stable versions and uses latest alpine as base im
   * `latest`, `mainline`, `1.7.x`
   * `stable`, `1.6.x`
 
+### Quay.io images
+
+* `quay.io/jitesoft/nginx`
+  * `latest`, `mainline`, `1.7.x`
+  * `stable`, `1.6.x`
+
 Dockerfiles can be found at [GitLab](https://gitlab.com/jitesoft/dockerfiles/nginx) and [GitHub](https://github.com/jitesoft/docker-nginx)
 
 ## Usage
