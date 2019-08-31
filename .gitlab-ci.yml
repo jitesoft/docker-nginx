@@ -76,14 +76,10 @@ download:
 
 .build:
   stage: build
-  image: registry.gitlab.com/jitesoft/dockerfiles/docker:18.09.6
+  image: registry.gitlab.com/jitesoft/dockerfiles/docker:latest
   dependencies:
     - download
-  services:
-    - registry.gitlab.com/jitesoft/dockerfiles/docker/dind:18.09.6
   script:
-    - echo ${CI_JOB_TOKEN} | docker login -u gitlab-ci-token registry.gitlab.com --password-stdin
-    - echo ${DOCKER_HUB_PASSWORD} | docker login -u ${DOCKER_HUB_USER} --password-stdin
     - mv nginx-${VERSION}.tar.gz nginx.tar.gz
     - docker build -t ${CI_REGISTRY_IMAGE}:${VERSION} --label "com.jitesoft.app.nginx.version=${VERSION}" .
     - TAGS="${TAGS} ${VERSION}"
