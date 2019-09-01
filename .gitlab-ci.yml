@@ -11,6 +11,9 @@ variables:
   VERSION: 1.17.1
 
 download:versions:
+  image: registry.gitlab.com/jitesoft/dockerfiles/alpine:latest
+  variables:
+    GIT_STRATEGY: none
   stage: prebuild
   before_script:
     - apk add --no-cache wget grep
@@ -54,6 +57,8 @@ gpg:import:
 download:
   stage: download
   image: registry.gitlab.com/jitesoft/dockerfiles/alpine:latest
+  variables:
+    GIT_STRATEGY: none
   dependencies:
     - download:versions
     - gpg:import
@@ -107,14 +112,21 @@ build:stable:
   variables:
     TAGS: "stable"
 
+
 scan:mainline:
+  needs:
+    - build:mainline
   stage: scan
   extends: .container_scanning
   variables:
     SCANNING_IMAGE_NAME: "${CI_REGISTRY_IMAGE}:mainline"
+    GIT_STRATEGY: none
 
 scan:stable:
+  needs:
+    - build:stable
   stage: scan
   extends: .container_scanning
   variables:
     SCANNING_IMAGE_NAME: "${CI_REGISTRY_IMAGE}:stable"
+    GIT_STRATEGY: none

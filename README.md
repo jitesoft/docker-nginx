@@ -1,5 +1,8 @@
 # Nginx
 
+[![Docker Pulls](https://img.shields.io/docker/pulls/jitesoft/nginx.svg)](https://cloud.docker.com/u/jitesoft/repository/docker/jitesoft/nginx)
+[![Back project](https://img.shields.io/badge/Open%20Collective-Tip%20the%20devs!-blue.svg)](https://opencollective.com/jitesoft-open-source)
+
 Nginx running on alpine linux.
 
 ## Tags
@@ -9,20 +12,21 @@ the latest mainline and latest stable versions and uses latest alpine as base im
 
 ### Docker Hub images
 
-* `latest`, `mainline`, `1.7.x`
-* `stable`, `1.6.x`
+* `jitesoft/nginx`
+    * `latest`, `mainline`, `1.7.x`
+    * `stable`, `1.6.x`
 
 ### GitLab images
 
 * `registry.gitlab.com/jitesoft/dockerfiles/nginx`
-  * `latest`, `mainline`, `1.7.x`
-  * `stable`, `1.6.x`
+    * `latest`, `mainline`, `1.7.x`
+    * `stable`, `1.6.x`
 
 ### Quay.io images
 
 * `quay.io/jitesoft/nginx`
-  * `latest`, `mainline`, `1.7.x`
-  * `stable`, `1.6.x`
+    * `latest`, `mainline`, `1.7.x`
+    * `stable`, `1.6.x`
 
 Dockerfiles can be found at [GitLab](https://gitlab.com/jitesoft/dockerfiles/nginx) and [GitHub](https://github.com/jitesoft/docker-nginx)
 
