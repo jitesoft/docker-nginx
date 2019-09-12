@@ -1,5 +1,5 @@
 include:
-  - https://gitlab.com/jitesoft/gitlab-ci-lib/raw/master/container_scan.yml
+  - https://gitlab.com/jitesoft/gitlab-ci-lib/raw/master/container_scan-v2.yml
 
 stages:
   - prebuild
@@ -116,7 +116,6 @@ build:stable:
 scan:mainline:
   needs:
     - build:mainline
-  stage: scan
   extends: .container_scanning
   variables:
     SCANNING_IMAGE_NAME: "${CI_REGISTRY_IMAGE}:mainline"
@@ -125,7 +124,6 @@ scan:mainline:
 scan:stable:
   needs:
     - build:stable
-  stage: scan
   extends: .container_scanning
   variables:
     SCANNING_IMAGE_NAME: "${CI_REGISTRY_IMAGE}:stable"
