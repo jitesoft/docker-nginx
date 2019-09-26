@@ -49,7 +49,7 @@ RUN addgroup -g 1000 www-data \
  && cd / \
  && rm -rf /tmp/nginx-src \
  && apk del .build-deps \
- && apk add --no-cache --virtual .runtime-deps openssl pcre zlib libxml2 libxslt gd geoip perl ca-certificates gettext \
+ && apk add --no-cache --virtual .runtime-deps openssl pcre zlib libxml2 libxslt gd geoip perl ca-certificates \
  && chown -R www-data:www-data /usr/local/nginx \
  && chown -R www-data:www-data /usr/local/bin \
  && chmod +x /usr/local/bin/entrypoint \
