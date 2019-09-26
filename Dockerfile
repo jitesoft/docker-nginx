@@ -9,11 +9,12 @@ LABEL maintainer="Johannes Tegnér <johannes@jitesoft.com>" \
 
 COPY ./nginx.tar.gz /tmp/nginx.tar.gz
 COPY ./entrypoint /usr/local/bin/
+COPY ./healthcheck /healthcheck
 
 RUN addgroup -g 1000 www-data \
  && adduser -u 1000 -G www-data -s /bin/sh -D www-data \
  && apk add --no-cache --virtual .build-deps build-base openssl-dev pcre-dev zlib-dev libxml2-dev libxslt-dev gd-dev geoip-dev perl-dev ca-certificates \
- && mkdir -p /tmp/nginx-src /var/log/nginx /usr/local/nginx \
+ && mkdir -p /tmp/nginx-src /var/log/nginx /usr/local/nginx/html \
  && tar -xzf /tmp/nginx.tar.gz -C /tmp/nginx-src --strip-components=1 \
  && rm -f /tmp/nginx.tar.gz \
  && cd /tmp/nginx-src/ \
@@ -55,9 +56,10 @@ RUN addgroup -g 1000 www-data \
  && nginx -v
 
 WORKDIR /usr/local/nginx/html
-COPY ./nginx.conf /etc/nginx.conf
-COPY ./default.template /usr/local/default.template
+COPY --chown=www-data ./nginx.conf /etc/nginx.conf
+COPY --chown=www-data ./default.template /usr/local/default.template
 EXPOSE 80
 VOLUME ["/etc/nginx/conf.d", "/usr/local/nginx/html"]
 ENTRYPOINT ["entrypoint"]
+HEALTHCHECK --interval=2m --timeout=5s CMD /healthcheck
 CMD ["nginx", "-g", "daemon off;"]
