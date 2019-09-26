@@ -9,7 +9,9 @@ LABEL maintainer="Johannes Tegnér <johannes@jitesoft.com>" \
 
 COPY ./nginx.tar.gz /tmp/nginx.tar.gz
 COPY ./entrypoint /usr/local/bin/
-COPY ./healthcheck /healthcheck
+COPY ./healthcheck /usr/local/bin/healthcheck
+
+ENV PORT="80"
 
 RUN addgroup -g 1000 www-data \
  && adduser -u 1000 -G www-data -s /bin/sh -D www-data \
@@ -61,5 +63,5 @@ COPY --chown=www-data ./default.template /usr/local/default.template
 EXPOSE 80
 VOLUME ["/etc/nginx/conf.d", "/usr/local/nginx/html"]
 ENTRYPOINT ["entrypoint"]
-HEALTHCHECK --interval=2m --timeout=5s CMD /healthcheck
+HEALTHCHECK --interval=30s --timeout=5s CMD healthcheck
 CMD ["nginx", "-g", "daemon off;"]
