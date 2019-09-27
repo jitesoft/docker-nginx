@@ -82,16 +82,6 @@ download:
     - mv nginx-${VERSION}.tar.gz nginx.tar.gz
     - TAG_LIST=$(helper taglist "jitesoft/nginx,${CI_REGISTRY_IMAGE}" "${VERSION}${TAGS}")
     - docker buildx build --platform ${PLATFORMS} --progress plain --push ${TAG_LIST} --build-arg VERSION=${VERSION} .
-
-    - |
-      for tag in ${TAGS}; do
-        docker tag ${CI_REGISTRY_IMAGE}:${VERSION} ${CI_REGISTRY_IMAGE}:${tag}
-        docker tag ${CI_REGISTRY_IMAGE}:${VERSION} jitesoft/nginx:${tag}
-        docker tag ${CI_REGISTRY_IMAGE}:${VERSION} quay.io/jitesoft/nginx:${tag}
-        docker push ${CI_REGISTRY_IMAGE}:${tag}
-        docker push jitesoft/nginx:${tag}
-        docker push quay.io/jitesoft/nginx:${tag}
-      done
   tags: [ jitesoft, buildx, amd64, arm64, x86, ppc64le, s390x ]
 
 build:mainline:
