@@ -1,11 +1,13 @@
 FROM registry.gitlab.com/jitesoft/dockerfiles/alpine:latest
+ARG VERSION
 LABEL maintainer="Johannes Tegnér <johannes@jitesoft.com>" \
       maintainer.org="Jitesoft" \
       maintainer.org.uri="https://jitesoft.com" \
       com.jitesoft.project.repo.type="git" \
       com.jitesoft.project.repo.uri="https://gitlab.com/jitesoft/dockerfiles/nginx" \
       com.jitesoft.project.repo.issues="https://gitlab.com/jitesoft/dockerfiles/nginx/issues" \
-      com.jitesoft.project.registry.uri="registry.gitlab.com/jitesoft/dockerfiles/nginx"
+      com.jitesoft.project.registry.uri="registry.gitlab.com/jitesoft/dockerfiles/nginx" \
+      com.jitesoft.app.nginx.version="${VERSION}"
 
 COPY ./nginx.tar.gz /tmp/nginx.tar.gz
 COPY ./entrypoint /usr/local/bin/

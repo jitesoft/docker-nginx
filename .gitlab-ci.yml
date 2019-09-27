@@ -5,10 +5,11 @@ stages:
   - prebuild
   - download
   - build
+  - extra
   - scan
 
 variables:
-  VERSION: 1.17.1
+  PLATFORMS: "linux/arm64,linux/amd64,linux/386,linux/ppc64le,linux/s390x"
 
 download:versions:
   image: registry.gitlab.com/jitesoft/dockerfiles/misc:latest
@@ -74,13 +75,14 @@ download:
 
 .build:
   stage: build
-  image: registry.gitlab.com/jitesoft/dockerfiles/docker:latest
+  image: registry.gitlab.com/jitesoft/dockerfiles/misc:latest
   dependencies:
     - download
   script:
     - mv nginx-${VERSION}.tar.gz nginx.tar.gz
-    - docker build -t ${CI_REGISTRY_IMAGE}:${VERSION} --label "com.jitesoft.app.nginx.version=${VERSION}" .
-    - TAGS="${TAGS} ${VERSION}"
+    - TAG_LIST=$(helper taglist "jitesoft/nginx,${CI_REGISTRY_IMAGE}" "${VERSION}${TAGS}")
+    - docker buildx build --platform ${PLATFORMS} --progress plain --push ${TAG_LIST} --build-arg VERSION=${VERSION} .
+
     - |
       for tag in ${TAGS}; do
         docker tag ${CI_REGISTRY_IMAGE}:${VERSION} ${CI_REGISTRY_IMAGE}:${tag}
@@ -90,13 +92,14 @@ download:
         docker push jitesoft/nginx:${tag}
         docker push quay.io/jitesoft/nginx:${tag}
       done
+  tags: [ jitesoft, buildx, amd64, arm64, x86, ppc64le, s390x ]
 
 build:mainline:
   before_script:
     - VERSION=$(awk '{print $1}' versions.txt)
   extends: .build
   variables:
-    TAGS: "latest mainline"
+    TAGS: ",latest,mainline"
 
 build:stable:
   before_script:
@@ -105,6 +108,17 @@ build:stable:
   variables:
     TAGS: "stable"
 
+push:non-multi-arch:
+  stage: extra
+  image: registry.gitlab.com/jitesoft/dockerfiles/misc:latest
+  script:
+    - STABLE_VERSION=$(awk '{print $2}' versions.txt)
+    - MAINLINE_VERSION=$(awk '{print $1}' versions.txt)
+    - docker pull ${CI_REGISTRY_IMAGE}:mainline
+    - docker pull ${CI_REGISTRY_IMAGE}:stable
+    - helper multitag ${CI_REGISTRY_IMAGE}:mainline quay.io/jitesoft/nginx:latest quay.io/jitesoft/nginx:${MAINLINE_VERSION} quay.io/jitesoft/nginx:mainline
+    - helper multitag ${CI_REGISTRY_IMAGE}:stable quay.io/jitesoft/nginx:${STABLE_VERSION} quay.io/jitesoft/nginx:stable
+    - helper multipush quay.io/jitesoft/nginx:${STABLE_VERSION} quay.io/jitesoft/nginx:stable quay.io/jitesoft/nginx:latest quay.io/jitesoft/nginx:${MAINLINE_VERSION} quay.io/jitesoft/nginx:mainline
 
 scan:mainline:
   needs:
