@@ -82,7 +82,7 @@ download:
     - mv nginx-${VERSION}.tar.gz nginx.tar.gz
     - TAG_LIST=$(helper taglist "jitesoft/nginx,${CI_REGISTRY_IMAGE}" "${VERSION}${TAGS}")
     - docker buildx build --platform ${PLATFORMS} --progress plain --push ${TAG_LIST} --build-arg VERSION=${VERSION} .
-  tags: [ jitesoft, buildx, amd64, arm64, x86, ppc64le, s390x ]
+  tags: [ jitesoft, buildx, protected ]
 
 build:mainline:
   before_script:
@@ -109,6 +109,7 @@ push:non-multi-arch:
     - helper multitag ${CI_REGISTRY_IMAGE}:mainline quay.io/jitesoft/nginx:latest quay.io/jitesoft/nginx:${MAINLINE_VERSION} quay.io/jitesoft/nginx:mainline
     - helper multitag ${CI_REGISTRY_IMAGE}:stable quay.io/jitesoft/nginx:${STABLE_VERSION} quay.io/jitesoft/nginx:stable
     - helper multipush quay.io/jitesoft/nginx:${STABLE_VERSION} quay.io/jitesoft/nginx:stable quay.io/jitesoft/nginx:latest quay.io/jitesoft/nginx:${MAINLINE_VERSION} quay.io/jitesoft/nginx:mainline
+  tags: [ protected, buildx, jitesoft ]
 
 scan:mainline:
   needs:
