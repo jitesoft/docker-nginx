@@ -57,6 +57,7 @@ RUN addgroup -g 1000 www-data \
  && chown -R www-data:www-data /usr/local/nginx \
  && chown -R www-data:www-data /usr/local/bin \
  && chmod +x /usr/local/bin/entrypoint \
+ && chmod +x /usr/local/bin/healthcheck \
  && nginx -v
 
 WORKDIR /usr/local/nginx/html
