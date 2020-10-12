@@ -1,5 +1,9 @@
 include:
-  - https://gitlab.com/jitesoft/gitlab-ci-lib/raw/master/container_scan-v2.yml
+  - file: /Scan/trivy.yml
+    project: jitesoft/gitlab-ci-lib
+
+# TODO: Rewrite, build should be in ci script rather than docker file.
+# TODO: Rewrite, Split up and use parallel builds.
 
 stages:
   - prebuild
@@ -80,7 +84,7 @@ download:
     - download
   script:
     - mv nginx-${VERSION}.tar.gz nginx.tar.gz
-    - TAG_LIST=$(helper taglist "jitesoft/nginx,${CI_REGISTRY_IMAGE}" "${VERSION}${TAGS}")
+    - TAG_LIST=$(helper taglist "ghcr.io/jitesoft/nginx,jitesoft/nginx,${CI_REGISTRY_IMAGE}" "${VERSION}${TAGS}")
     - docker buildx build --platform ${PLATFORMS} --progress plain --push ${TAG_LIST} --build-arg VERSION=${VERSION} .
   tags: [ jitesoft, buildx, protected ]
 
