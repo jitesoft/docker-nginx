@@ -10,25 +10,16 @@ Nginx running on alpine linux.
 The image is built automatically via CI, so the versions may change, but the CI script builds
 the latest mainline and latest stable versions and uses latest alpine as base image.
 
-### Docker Hub images
+Images can be found at:
 
-* `jitesoft/nginx`
-    * `latest`, `mainline`, `1.7.x`
-    * `stable`, `1.6.x`
+* [Docker hub](https://hub.docker.com/r/jitesoft/nginx): `jitesoft/nginx`  
+* [GitLab](https://gitlab.com/jitesoft/dockerfiles/nginx): `registry.gitlab.com/jitesoft/dockerfiles/nginx`
+* [GitHub](https://github.com/orgs/jitesoft/packages/container/package/nginx): `ghcr.io/jitesoft/nginx`
+* [Quay](https://quay.io/jitesoft/nginx): `quay.io/jitesoft/nginx`  
 
-### GitLab images
+## Dockerfile
 
-* `registry.gitlab.com/jitesoft/dockerfiles/nginx`
-    * `latest`, `mainline`, `1.7.x`
-    * `stable`, `1.6.x`
-
-### Quay.io images
-
-* `quay.io/jitesoft/nginx`
-    * `latest`, `mainline`, `1.7.x`
-    * `stable`, `1.6.x`
-
-Dockerfiles can be found at [GitLab](https://gitlab.com/jitesoft/dockerfiles/nginx) and [GitHub](https://github.com/jitesoft/docker-nginx)
+Dockerfile can be found at [GitLab](https://gitlab.com/jitesoft/dockerfiles/nginx) and [GitHub](https://github.com/jitesoft/docker-nginx)
 
 ## Usage
 
