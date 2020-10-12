@@ -100,7 +100,7 @@ build:stable:
     - VERSION=$(awk '{print $2}' versions.txt)
   extends: .build
   variables:
-    TAGS: "stable"
+    TAGS: ",stable"
 
 push:non-multi-arch:
   stage: extra
