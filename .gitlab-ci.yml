@@ -12,6 +12,9 @@ stages:
   - post
   - scan
 
+variables:
+#  REGISTRIES: "ghcr.io/jitesoft/nginx,jitesoft/nginx,${CI_REGISTRY_IMAGE}"
+  REGISTRIES: "${CI_REGISTRY_IMAGE}"
 
 check:
   image: registry.gitlab.com/jitesoft/dockerfiles/misc:latest
@@ -25,12 +28,11 @@ check:
     GIT_STRATEGY: none
   stage: pre
   script:
-    - touch versions.txt
+    - touch STABLE.txt
+    - touch MAINLINE.txt
     - VERSIONS=$(wget -qO- https://nginx.org/en/download.html | grep -oP '(?<=\<a href=\"/download/nginx\-)([0-9]{0,2}(\.?)){2}([0-9]{0,2})' | awk '{print $1}' | uniq | head -n2)
     - MAINLINE=$(echo $VERSIONS | awk '{print $1}');
     - STABLE=$(echo $VERSIONS | awk '{print $2}');
-    - MAINLINE_OLD=$(cat versions.txt | awk '{print $1}');
-    - STABLE_OLD=$(cat version.txt | awk '{print $2}');
     - |
       if [ "${MAINLINE}" != "$(cat MAINLINE.txt)" ] || [ -n "${FORCE_BUILD}" ] ; then
         curl -F token=${CI_JOB_TOKEN} -F ref=master -F "variables[VERSION]=${MAINLINE}" -F "variables[BUILD]=true" -F "variables[TYPE]=MAINLINE" https://gitlab.com/api/v4/projects/${CI_PROJECT_ID}/trigger/pipeline
@@ -225,7 +227,7 @@ containerize:
     - EXTRA_TAGS=""
     - if [  "${TYPE}" == "MAINLINE" ]; EXTRA_TAGS=",latest"; fi
     - TYPE_TAG=$(echo "${TYPE}" | awk '{print tolower($0)}')
-    - TAGS=$(helper "ghcr.io/jitesoft/nginx,jitesoft/nginx,${CI_REGISTRY_IMAGE}" "${VERSION},${TYPE_TAG}${EXTRA_TAGS}")
+    - TAGS=$(helper "${REGISTRIES}" "${VERSION},${TYPE_TAG}${EXTRA_TAGS}")
     - docker buildx build --platform ${ARCHS} --push ${TAGS} --progress plain --build-arg VERSION=${VERSION} .
     - echo -e "${VERSION}" > ${TYPE}.txt
   tags: [ buildx, protected ]
