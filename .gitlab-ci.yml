@@ -3,34 +3,72 @@ include:
     project: jitesoft/gitlab-ci-lib
 
 # TODO: Rewrite, build should be in ci script rather than docker file.
-# TODO: Rewrite, Split up and use parallel builds.
 
 stages:
-  - prebuild
+  - pre
   - download
   - build
-  - extra
+  - containerize
+  - post
   - scan
 
-variables:
-  PLATFORMS: "linux/arm64,linux/amd64,linux/386,linux/ppc64le,linux/s390x"
 
-download:versions:
+check:
   image: registry.gitlab.com/jitesoft/dockerfiles/misc:latest
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "schedule"'
+      when: always
+    - if: '$CI_PIPELINE_SOURCE == "web"'
+      when: always
+    - when: never
   variables:
     GIT_STRATEGY: none
-  stage: prebuild
+  stage: pre
   script:
+    - touch versions.txt
     - VERSIONS=$(wget -qO- https://nginx.org/en/download.html | grep -oP '(?<=\<a href=\"/download/nginx\-)([0-9]{0,2}(\.?)){2}([0-9]{0,2})' | awk '{print $1}' | uniq | head -n2)
-    - echo -e ${VERSIONS} > versions.txt
-  artifacts:
+    - MAINLINE=$(echo $VERSIONS | awk '{print $1}');
+    - STABLE=$(echo $VERSIONS | awk '{print $2}');
+    - MAINLINE_OLD=$(cat versions.txt | awk '{print $1}');
+    - STABLE_OLD=$(cat version.txt | awk '{print $2}');
+    - |
+      if [ "${MAINLINE}" != "$(cat MAINLINE.txt)" ] || [ -n "${FORCE_BUILD}" ] ; then
+        curl -F token=${CI_JOB_TOKEN} -F ref=master -F "variables[VERSION]=${MAINLINE}" -F "variables[BUILD]=true" -F "variables[TYPE]=MAINLINE" https://gitlab.com/api/v4/projects/${CI_PROJECT_ID}/trigger/pipeline
+      else
+        curl -F token=${CI_JOB_TOKEN} -F ref=master -F "variables[VERSION]=${MAINLINE}" -F "variables[SCAN]=true" https://gitlab.com/api/v4/projects/${CI_PROJECT_ID}/trigger/pipeline
+      fi
+    - |
+      if [ "${STABLE}" != "$(cat STABLE.txt)" ] || [ -n "${FORCE_BUILD}" ]; then
+        curl -F token=${CI_JOB_TOKEN} -F ref=master -F "variables[VERSION]=${STABLE}" -F "variables[BUILD]=true" -F "variables[TYPE]=STABLE" https://gitlab.com/api/v4/projects/${CI_PROJECT_ID}/trigger/pipeline
+      else
+        curl -F token=${CI_JOB_TOKEN} -F ref=master -F "variables[VERSION]=${STABLE}" -F "variables[SCAN]=true" https://gitlab.com/api/v4/projects/${CI_PROJECT_ID}/trigger/pipeline
+      fi
+  cache:
     paths:
-      - versions.txt
-    expire_in: 1 day
+      - MAINLINE.txt
+      - STABLE.txt
+    key: nginx.versions
+    policy: pull
+
+scan:mainline:
+  rules:
+    - if: "$SCAN"
+      when: always
+    - if: "${VERSION}"
+      when: always
+    - when: never
+  extends: .container_scanning
+  variables:
+    SCANNING_IMAGE_NAME: "${CI_REGISTRY_IMAGE}:${VERSION}"
+    GIT_STRATEGY: none
 
 gpg:import:
+  rules:
+    - if: "$BUILD"
+      when: always
+    - when: never
   image: registry.gitlab.com/jitesoft/dockerfiles/misc:latest
-  stage: prebuild
+  stage: pre
   script:
     - |
       if [ -f keys.out ]; then
@@ -55,6 +93,10 @@ gpg:import:
     expire_in: 1 day
 
 download:
+  rules:
+    - if: "$BUILD"
+      when: on_success
+    - when: never
   stage: download
   image: registry.gitlab.com/jitesoft/dockerfiles/misc:latest
   variables:
@@ -66,9 +108,9 @@ download:
     - gpg --import keys.out
     - |
       for VERSION in `cat versions.txt`; do
-        curl -L https://nginx.org/download/nginx-${VERSION}.tar.gz -o nginx-${VERSION}.tar.gz
+        curl -L https://nginx.org/download/nginx-${VERSION}.tar.gz -o nginx-${TYPE}.tar.gz
         curl -L https://nginx.org/download/nginx-${VERSION}.tar.gz.asc -o pgp.asc
-        gpg --verify pgp.asc nginx-${VERSION}.tar.gz
+        gpg --verify pgp.asc nginx-${TYPE}.tar.gz
         rm pgp.asc
       done
   artifacts:
@@ -78,55 +120,133 @@ download:
     expire_in: 1 day
 
 .build:
+  rules:
+    - if: "$BUILD"
+      when: on_success
+    - when: never
   stage: build
-  image: registry.gitlab.com/jitesoft/dockerfiles/misc:latest
-  dependencies:
-    - download
+  needs:
+    - job: gpg:verify
+  before_script:
+    - export PATH="/usr/lib/ccache/bin:$PATH"
+    - mkdir ${CI_PROJECT_DIR}/ccache
+    - export CCACHE_DIR="${CI_PROJECT_DIR}/ccache"
+    - ccache -s
+    - export CPPFLAGS="${CPPFLAGS} -fstack-protector-strong -fpic -fpie -O2"
+    - export CFLAGS="${CFLAGS} -fstack-protector-strong -fpic -fpie -O2"
+    - mkdir src
+    - tar -xzf nginx-${TYPE}.tar.gz -C src --strip-components=1
+    script:
+    - addgroup -g 1000 www-data && adduser -u 1000 -G www-data -s /bin/sh -D www-data
+    - apk add --no-cache pcre-dev libxml2-dev libxslt-dev gd-dev geoip-dev perl-dev
+    - |
+      ./configure \
+          --user=www-data \
+          --group=www-data \
+          --conf-path=/etc/nginx.conf \
+          --with-http_addition_module \
+          --with-http_addition_module \
+          --with-http_auth_request_module \
+          --with-http_dav_module \
+          --with-http_geoip_module \
+          --with-http_gzip_static_module \
+          --with-http_image_filter_module \
+          --with-http_perl_module \
+          --with-http_realip_module \
+          --with-http_ssl_module \
+          --with-http_stub_status_module \
+          --with-http_sub_module \
+          --with-http_xslt_module \
+          --with-ipv6 \
+          --with-mail \
+          --with-mail_ssl_module \
+          --with-pcre-jit \
+          --error-log-path=/proc/self/fd/2 \
+          --http-log-path=/proc/self/fd/1 \
+          --prefix=/usr/local/nginx \
+          --sbin-path=/usr/local/bin
+    - make
+    - find -type f -name '*.a' -delete
+    - make install
+    - cp entrypoint /usr/local/bin/
+    - cp healthcheck /usr/local/bin/
+    - $(cd /usr/local && tar -czf /tmp/nginx-${ARCH}.tar.gz *)
+    - mkdir binaries
+    - cp nginx.conf binaries/nginx.conf
+    - cp default.template binaries/default.template
+    - mv /tmp/nginx-${ARCH}.tar.gz binaries/
+  after_script:
+    - ccache -s
+  cache:
+    paths:
+      - ccache
+    key: nginx.build-ccache-${ARCH}-${TYPE}
+  artifacts:
+    paths: binaries/
+    when: on_success
+    expire_in: 1 day
+
+build:arm64:
+  extends: .build
+  tags: [ native-arm64 ]
+  variables:
+    ARCH: arm64
+
+build:amd64:
+  extends: .build
+  tags: [ native-amd64 ]
+  variables:
+    ARCH: amd64
+
+build:others:
+  extends: .build
+  parallel:
+    matrix:
+      - { ARCH: "s390x", NILL: "null" }
+      - { ARCH: "ppc64le", NILL: "null" }
+      - { ARCH: "386", NILL: "null" }
+
+containerize:
+  rules:
+    - if: "$BUILD"
+      when: on_success
+    - when: never
+  variables:
+    ARCHS: "linux/arm64,linux/amd64,linux/386,linux/ppc64le,linux/s390x"
+  stage: containerize
+  needs:
+    - job: build:arm64
+      artifacts: true
+    - job: build:amd64
+      artifacts: true
+    - job: build:others
+      artifacts: true
   script:
-    - mv nginx-${VERSION}.tar.gz nginx.tar.gz
-    - TAG_LIST=$(helper taglist "ghcr.io/jitesoft/nginx,jitesoft/nginx,${CI_REGISTRY_IMAGE}" "${VERSION}${TAGS}")
-    - docker buildx build --platform ${PLATFORMS} --progress plain --push ${TAG_LIST} --build-arg VERSION=${VERSION} .
-  tags: [ jitesoft, buildx, protected ]
-
-build:mainline:
-  before_script:
-    - VERSION=$(awk '{print $1}' versions.txt)
-  extends: .build
-  variables:
-    TAGS: ",latest,mainline"
-
-build:stable:
-  before_script:
-    - VERSION=$(awk '{print $2}' versions.txt)
-  extends: .build
-  variables:
-    TAGS: ",stable"
+    - EXTRA_TAGS=""
+    - if [  "${TYPE}" == "MAINLINE" ]; EXTRA_TAGS=",latest"; fi
+    - TYPE_TAG=$(echo "${TYPE}" | awk '{print tolower($0)}')
+    - TAGS=$(helper "ghcr.io/jitesoft/nginx,jitesoft/nginx,${CI_REGISTRY_IMAGE}" "${VERSION},${TYPE_TAG}${EXTRA_TAGS}")
+    - docker buildx build --platform ${ARCHS} --push ${TAGS} --progress plain --build-arg VERSION=${VERSION} .
+    - echo -e "${VERSION}" > ${TYPE}.txt
+  tags: [ buildx, protected ]
+  cache:
+    policy: pull-push
+    paths:
+      - MAINLINE.txt
+      - STABLE.txt
+    key: nginx.versions
 
 push:non-multi-arch:
-  stage: extra
+  rules:
+    - if: "$BUILD"
+      when: on_success
+    - when: never
+  stage: post
   image: registry.gitlab.com/jitesoft/dockerfiles/misc:latest
   script:
-    - STABLE_VERSION=$(awk '{print $2}' versions.txt)
-    - MAINLINE_VERSION=$(awk '{print $1}' versions.txt)
-    - docker pull ${CI_REGISTRY_IMAGE}:mainline
-    - docker pull ${CI_REGISTRY_IMAGE}:stable
-    - helper multitag ${CI_REGISTRY_IMAGE}:mainline quay.io/jitesoft/nginx:latest quay.io/jitesoft/nginx:${MAINLINE_VERSION} quay.io/jitesoft/nginx:mainline
-    - helper multitag ${CI_REGISTRY_IMAGE}:stable quay.io/jitesoft/nginx:${STABLE_VERSION} quay.io/jitesoft/nginx:stable
-    - helper multipush quay.io/jitesoft/nginx:${STABLE_VERSION} quay.io/jitesoft/nginx:stable quay.io/jitesoft/nginx:latest quay.io/jitesoft/nginx:${MAINLINE_VERSION} quay.io/jitesoft/nginx:mainline
-  tags: [ protected, buildx, jitesoft ]
+    - TYPE_TAG=$(echo "${TYPE}" | awk '{print tolower($0)}')
+    - docker pull ${CI_REGISTRY_IMAGE}:${TYPE_TAG}
+    - helper multitag ${CI_REGISTRY_IMAGE}:${TYPE_TAG} quay.io/jitesoft/nginx:latest quay.io/jitesoft/nginx:${VERSION} quay.io/jitesoft/nginx:${TYPE_TAG}
+    - helper multipush quay.io/jitesoft/nginx:latest quay.io/jitesoft/nginx:${VERSION} quay.io/jitesoft/nginx:${TYPE_TAG}
+  tags: [ protected, buildx ]
 
-scan:mainline:
-  needs:
-    - build:mainline
-  extends: .container_scanning
-  variables:
-    SCANNING_IMAGE_NAME: "${CI_REGISTRY_IMAGE}:mainline"
-    GIT_STRATEGY: none
-
-scan:stable:
-  needs:
-    - build:stable
-  extends: .container_scanning
-  variables:
-    SCANNING_IMAGE_NAME: "${CI_REGISTRY_IMAGE}:stable"
-    GIT_STRATEGY: none
