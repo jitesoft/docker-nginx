@@ -1,6 +1,8 @@
 include:
   - file: /Scan/trivy.yml
     project: jitesoft/gitlab-ci-lib
+  - file: /OCI/arch-image.yml
+    project: jitesoft/gitlab-ci-lib
 
 stages:
   - pre
@@ -194,6 +196,7 @@ build:arm64:
   tags: [ native-arm64 ]
   variables:
     ARCH: arm64
+    HOST: aarch64-unknown-musl
 
 build:amd64:
   extends: .build
@@ -201,13 +204,38 @@ build:amd64:
   variables:
     ARCH: amd64
 
-build:others:
-  extends: .build
-  parallel:
-    matrix:
-      - { ARCH: "s390x", NILL: "null" }
-      - { ARCH: "ppc64le", NILL: "null" }
-      - { ARCH: "386", NILL: "null" }
+
+build:arm:
+  extends:
+    - .build
+    - .buildbase.ppc64le
+  tags: [ buildx ]
+  variables:
+    ARCH: arm
+
+build:x390s:
+  extends:
+    - .build
+    - .buildbase.s390x
+  tags: [ buildx ]
+  variables:
+    ARCH: s390x
+
+build:i386:
+  extends:
+    - .build
+    - .buildbase.386
+  tags: [ buildx ]
+  variables:
+    ARCH: 386
+
+build:ppc64le:
+  extends:
+    - .build
+    - .buildbase.ppc64le
+  tags: [ buildx ]
+  variables:
+    ARCH: ppc64le
 
 containerize:
   rules:
