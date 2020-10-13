@@ -106,17 +106,12 @@ download:
       artifacts: true
   script:
     - gpg --import keys.out
-    - |
-      for VERSION in `cat versions.txt`; do
-        curl -L https://nginx.org/download/nginx-${VERSION}.tar.gz -o nginx-${TYPE}.tar.gz
-        curl -L https://nginx.org/download/nginx-${VERSION}.tar.gz.asc -o pgp.asc
-        gpg --verify pgp.asc nginx-${TYPE}.tar.gz
-        rm pgp.asc
-      done
+      curl -L https://nginx.org/download/nginx-${VERSION}.tar.gz -o nginx-${TYPE}.tar.gz
+      curl -L https://nginx.org/download/nginx-${VERSION}.tar.gz.asc -o pgp.asc
+      gpg --verify pgp.asc nginx-${TYPE}.tar.gz
   artifacts:
     paths:
       - nginx-*.tar.gz
-      - versions.txt
     expire_in: 1 day
 
 .build:
