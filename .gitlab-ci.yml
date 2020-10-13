@@ -234,7 +234,7 @@ build:ppc64le:
     ARCH: ppc64le
 
 containerize:
-  image: registry.gitlab.com/jitesoft/dockeffiles/misc:latest
+  image: registry.gitlab.com/jitesoft/dockefiles/misc:latest
   rules:
     - if: "$BUILD"
       when: on_success
