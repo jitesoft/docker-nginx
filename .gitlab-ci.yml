@@ -106,9 +106,9 @@ download:
       artifacts: true
   script:
     - gpg --import keys.out
-      curl -L https://nginx.org/download/nginx-${VERSION}.tar.gz -o nginx-${TYPE}.tar.gz
-      curl -L https://nginx.org/download/nginx-${VERSION}.tar.gz.asc -o pgp.asc
-      gpg --verify pgp.asc nginx-${TYPE}.tar.gz
+    - curl -L https://nginx.org/download/nginx-${VERSION}.tar.gz -o nginx-${TYPE}.tar.gz
+    - curl -L https://nginx.org/download/nginx-${VERSION}.tar.gz.asc -o pgp.asc
+    - gpg --verify pgp.asc nginx-${TYPE}.tar.gz
   artifacts:
     paths:
       - nginx-*.tar.gz
