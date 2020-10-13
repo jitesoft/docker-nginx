@@ -234,6 +234,7 @@ build:ppc64le:
     ARCH: ppc64le
 
 containerize:
+  image: registry.gitlab.com/jitesoft/dockeffiles/misc:latest
   rules:
     - if: "$BUILD"
       when: on_success
@@ -248,7 +249,7 @@ containerize:
       artifacts: true
   script:
     - EXTRA_TAGS=""
-    - if [  "${TYPE}" == "MAINLINE" ]; EXTRA_TAGS=",latest"; fi
+    - if [  "${TYPE}" == "MAINLINE" ]; then EXTRA_TAGS=",latest"; fi
     - TYPE_TAG=$(echo "${TYPE}" | awk '{print tolower($0)}')
     - TAGS=$(helper "${REGISTRIES}" "${VERSION},${TYPE_TAG}${EXTRA_TAGS}")
     - docker buildx build --platform ${ARCHS} --push ${TAGS} --progress plain --build-arg VERSION=${VERSION} .
