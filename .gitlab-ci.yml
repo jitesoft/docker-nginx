@@ -144,7 +144,7 @@ download:
       ./configure \
         --user=www-data \
         --group=www-data \
-        --conf-path=/etc/nginx.conf \
+        --conf-path=/etc/nginx/nginx.conf \
         --with-http_addition_module \
         --with-http_addition_module \
         --with-http_auth_request_module \
@@ -173,6 +173,7 @@ download:
     - cp entrypoint /usr/local/bin/
     - cp healthcheck /usr/local/bin/
     - $(cd /usr/local && tar -czf /tmp/nginx-${ARCH}.tar.gz *)
+    - $(cd /etc/nginx && tar -czf /tmp/nginx-conf-${ARCH}.tar.gz *)
     - mkdir binaries
     - cp nginx.conf binaries/nginx.conf
     - cp default.template binaries/default.template
@@ -256,6 +257,8 @@ containerize:
     - job: build:i386
       artifacts: true
   script:
+    - touch MAINLINE.txt
+    - touch STABLE.txt
     - EXTRA_TAGS=""
     - if [  "${TYPE}" == "MAINLINE" ]; then EXTRA_TAGS=",latest"; fi
     - TYPE_TAG=$(echo "${TYPE}" | awk '{print tolower($0)}')
