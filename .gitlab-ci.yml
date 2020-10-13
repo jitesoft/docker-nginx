@@ -130,6 +130,7 @@ download:
     - echo "My architecture is $(cat /etc/apk/arch)!"
     - export PATH="/usr/lib/ccache/bin:$PATH"
     - mkdir -p ${CI_PROJECT_DIR}/ccache
+    - mkdir -p ${CI_PROJECT_DIR}/src
     - export CCACHE_DIR="${CI_PROJECT_DIR}/ccache"
     - ccache -s
     - export CPPFLAGS="${CPPFLAGS} -fstack-protector-strong -fpic -fpie -O2"
@@ -193,7 +194,6 @@ build:arm64:
   tags: [ native-arm64 ]
   variables:
     ARCH: arm64
-    HOST: aarch64-unknown-musl
 
 build:amd64:
   extends: .build
