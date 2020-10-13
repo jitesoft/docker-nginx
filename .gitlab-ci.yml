@@ -253,6 +253,8 @@ containerize:
       artifacts: true
     - job: build:ppc64le
       artifacts: true
+    - job: build:i386
+      artifacts: true
   script:
     - EXTRA_TAGS=""
     - if [  "${TYPE}" == "MAINLINE" ]; then EXTRA_TAGS=",latest"; fi
