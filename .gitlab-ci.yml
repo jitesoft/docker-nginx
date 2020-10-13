@@ -178,6 +178,7 @@ download:
     - cp nginx.conf binaries/nginx.conf
     - cp default.template binaries/default.template
     - mv /tmp/nginx-${ARCH}.tar.gz binaries/
+    - mv /tmp/nginx-conf-${ARCH}.tar.gz binaries/
   after_script:
     - ccache -s
   cache:
