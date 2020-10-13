@@ -250,8 +250,6 @@ containerize:
       artifacts: true
     - job: build:amd64
       artifacts: true
-    - job: build:others
-      artifacts: true
   script:
     - EXTRA_TAGS=""
     - if [  "${TYPE}" == "MAINLINE" ]; EXTRA_TAGS=",latest"; fi
