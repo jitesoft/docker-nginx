@@ -136,6 +136,7 @@ download:
   script:
     - addgroup -g 1000 www-data && adduser -u 1000 -G www-data -s /bin/sh -D www-data
     - apk add --no-cache pcre-dev libxml2-dev libxslt-dev gd-dev geoip-dev perl-dev
+    - cd src
     - |
       ./configure \
           --user=www-data \
@@ -165,6 +166,7 @@ download:
     - make
     - find -type f -name '*.a' -delete
     - make install
+    - cd ..
     - cp entrypoint /usr/local/bin/
     - cp healthcheck /usr/local/bin/
     - $(cd /usr/local && tar -czf /tmp/nginx-${ARCH}.tar.gz *)
