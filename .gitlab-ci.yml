@@ -247,6 +247,12 @@ containerize:
       artifacts: true
     - job: build:amd64
       artifacts: true
+    - job: build:arm
+      artifacts: true
+    - job: build:s390x
+      artifacts: true
+    - job: build:ppc64le
+      artifacts: true
   script:
     - EXTRA_TAGS=""
     - if [  "${TYPE}" == "MAINLINE" ]; then EXTRA_TAGS=",latest"; fi
