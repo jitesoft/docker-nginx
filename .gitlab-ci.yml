@@ -120,6 +120,7 @@ download:
     expire_in: 1 day
 
 .build:
+  image: registry.gitlab.com/jitesoft/dockerfiles/misc/buildbase:latest
   rules:
     - if: "$BUILD"
       when: on_success
