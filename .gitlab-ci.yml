@@ -127,23 +127,20 @@ download:
     - job: download
       artifacts: true
   before_script:
+    - echo "My architecture is $(cat /etc/apk/arch)!"
     - export PATH="/usr/lib/ccache/bin:$PATH"
-    - mkdir ${CI_PROJECT_DIR}/ccache
+    - mkdir -p ${CI_PROJECT_DIR}/ccache
     - export CCACHE_DIR="${CI_PROJECT_DIR}/ccache"
     - ccache -s
     - export CPPFLAGS="${CPPFLAGS} -fstack-protector-strong -fpic -fpie -O2"
     - export CFLAGS="${CFLAGS} -fstack-protector-strong -fpic -fpie -O2"
-    - mkdir src
     - tar -xzf nginx-${TYPE}.tar.gz -C src --strip-components=1
   script:
     - addgroup -g 1000 www-data && adduser -u 1000 -G www-data -s /bin/sh -D www-data
     - apk add --no-cache pcre-dev libxml2-dev libxslt-dev gd-dev geoip-dev perl-dev
     - cd src
-    - $HOST=$(cat /etc/apk/arch);
-    - if [ "${ARCH}" != "arm64" ] && [ "${ARCH}" != "amd64" ]; then HOST="${ARCH}"; fi
     - |
       ./configure \
-        --host=${HOST}
         --user=www-data \
         --group=www-data \
         --conf-path=/etc/nginx.conf \
@@ -203,7 +200,6 @@ build:amd64:
   tags: [ native-amd64 ]
   variables:
     ARCH: amd64
-
 
 build:arm:
   extends:
