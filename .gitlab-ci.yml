@@ -209,7 +209,7 @@ build:arm:
   variables:
     ARCH: arm
 
-build:x390s:
+build:s390x:
   extends:
     - .build
     - .buildbase.s390x
