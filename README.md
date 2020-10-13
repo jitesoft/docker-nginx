@@ -7,8 +7,7 @@ Nginx running on alpine linux.
 
 ## Tags
 
-The image is built automatically via CI, so the versions may change, but the CI script builds
-the latest mainline and latest stable versions and uses latest alpine as base image.
+The image is built automatically via CI, using latest alpine as base image.
 
 Images can be found at:
 
