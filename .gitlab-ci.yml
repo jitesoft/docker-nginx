@@ -2,8 +2,6 @@ include:
   - file: /Scan/trivy.yml
     project: jitesoft/gitlab-ci-lib
 
-# TODO: Rewrite, build should be in ci script rather than docker file.
-
 stages:
   - pre
   - download
@@ -52,14 +50,14 @@ check:
     key: nginx.versions
     policy: pull
 
-scan:mainline:
+scan:
+  extends: .container_scanning
   rules:
     - if: "$SCAN"
       when: always
-    - if: "${VERSION}"
+    - if: "$VERSION"
       when: always
     - when: never
-  extends: .container_scanning
   variables:
     SCANNING_IMAGE_NAME: "${CI_REGISTRY_IMAGE}:${VERSION}"
     GIT_STRATEGY: none
@@ -103,9 +101,9 @@ download:
   image: registry.gitlab.com/jitesoft/dockerfiles/misc:latest
   variables:
     GIT_STRATEGY: none
-  dependencies:
-    - download:versions
-    - gpg:import
+  needs:
+    - job: gpg:import
+      artifacts: true
   script:
     - gpg --import keys.out
     - |
@@ -128,7 +126,7 @@ download:
     - when: never
   stage: build
   needs:
-    - job: gpg:verify
+    - job: gpg:import
       artifacts: true
   before_script:
     - export PATH="/usr/lib/ccache/bin:$PATH"
@@ -139,7 +137,7 @@ download:
     - export CFLAGS="${CFLAGS} -fstack-protector-strong -fpic -fpie -O2"
     - mkdir src
     - tar -xzf nginx-${TYPE}.tar.gz -C src --strip-components=1
-    script:
+  script:
     - addgroup -g 1000 www-data && adduser -u 1000 -G www-data -s /bin/sh -D www-data
     - apk add --no-cache pcre-dev libxml2-dev libxslt-dev gd-dev geoip-dev perl-dev
     - |
@@ -185,7 +183,8 @@ download:
       - ccache
     key: nginx.build-ccache-${ARCH}-${TYPE}
   artifacts:
-    paths: binaries/
+    paths:
+      - binaries/
     when: on_success
     expire_in: 1 day
 
