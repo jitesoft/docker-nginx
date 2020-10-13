@@ -13,8 +13,7 @@ stages:
   - scan
 
 variables:
-#  REGISTRIES: "ghcr.io/jitesoft/nginx,jitesoft/nginx,${CI_REGISTRY_IMAGE}"
-  REGISTRIES: "${CI_REGISTRY_IMAGE}"
+  REGISTRIES: "ghcr.io/jitesoft/nginx,jitesoft/nginx,${CI_REGISTRY_IMAGE}"
 
 check:
   image: registry.gitlab.com/jitesoft/dockerfiles/misc:latest
