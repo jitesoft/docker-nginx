@@ -21,7 +21,7 @@ RUN --mount=type=bind,source=./binaries,target=/tmp/bin \
  && mkdir -p /etc/nginx/conf.d /var/log/nginx /usr/local/nginx/html \
  && tar -xzhf /tmp/bin/nginx-conf-${TARGETARCH}.tar.gz -C /etc/nginx \
  && cp /tmp/bin/nginx.conf /etc/nginx/nginx.conf \
- && cp /tmp/bin/healthcheck.conf /etc/nginx/conf.d/000-healthcheck.conf /
+ && cp /tmp/bin/healthcheck.conf /etc/nginx/conf.d/000-healthcheck.conf \
  && chmod +x /usr/local/bin/* \
  && chown -R www-data:www-data /usr/local/nginx \
  && chown -R www-data:www-data /etc/nginx \
