@@ -35,6 +35,16 @@ named env variables passed.
 
 The default template file is located at `/usr/local/default.template` and exposes `LISTEN_PORT`, `SERVER_NAME` and `SERVER_ROOT` env variables and defaults to `80`, `localhost` and `/usr/local/nginx/html`.
 
+It's also possible to change the full initial nginx configuration by replacing the `/etc/nginx/nginx.conf` file, while not recommended (rather create a new file to override in `/etc/nginx/conf.d`).
+
+### Healthcheck
+
+By default, the container will run a health check - via the `healthcheck` shell script - every 30 seconds.  
+The health check script uses wget to hit a special endpoint (`127.0.0.1:3999/__health`), which is automatically created in the `/etc/nginx/conf.d/000-healthcheck.conf` configuration.  
+It's possible to turn the healthcheck off by setting `SKIP_HEALTHCHECK=true` as an env variable. The healthcheck will still run, but always return as healthy.  
+  
+Changing the healthcheck scripts is possible, while not recommended.
+
 ## Licenses
 
 Dockerfiles and other scripts in the repository is released under the [MIT license](https://gitlab.com/jitesoft/dockerfiles/nginx/blob/master/LICENSE)
