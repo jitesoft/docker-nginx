@@ -175,6 +175,7 @@ download:
     - $(cd /etc/nginx && tar -czf /tmp/nginx-conf-${ARCH}.tar.gz *)
     - mkdir binaries
     - cp nginx.conf binaries/nginx.conf
+    - cp healthcheck.conf binaries/healthcheck.conf
     - cp default.template binaries/default.template
     - mv /tmp/nginx-${ARCH}.tar.gz binaries/
     - mv /tmp/nginx-conf-${ARCH}.tar.gz binaries/

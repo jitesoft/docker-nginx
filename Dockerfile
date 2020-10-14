@@ -18,12 +18,13 @@ RUN --mount=type=bind,source=./binaries,target=/tmp/bin \
  && cp /tmp/bin/default.template /usr/local/default.template \
  && addgroup -g 1000 www-data \
  && adduser -u 1000 -G www-data -s /bin/sh -D www-data \
- && mkdir -p /etc/nginx /var/log/nginx /usr/local/nginx/html \
+ && mkdir -p /etc/nginx/conf.d /var/log/nginx /usr/local/nginx/html \
  && tar -xzhf /tmp/bin/nginx-conf-${TARGETARCH}.tar.gz -C /etc/nginx \
  && cp /tmp/bin/nginx.conf /etc/nginx/nginx.conf \
+ && cp /tmp/bin/healthcheck.conf /etc/nginx/conf.d/000-healthcheck.conf /
  && chmod +x /usr/local/bin/* \
  && chown -R www-data:www-data /usr/local/nginx \
- && chown www-data:www-data /etc/nginx/nginx.conf \
+ && chown -R www-data:www-data /etc/nginx \
  && apk add --no-cache --virtual .runtime-deps openssl pcre zlib libxml2 libxslt gd geoip perl ca-certificates \
  && nginx -v
 
