@@ -242,7 +242,7 @@ containerize:
       when: on_success
     - when: never
   variables:
-    ARCHS: "linux/arm64,linux/amd64,linux/386,linux/ppc64le,linux/s390x"
+    ARCHS: "linux/arm64,linux/amd64,linux/386,linux/ppc64le,linux/s390x,linux/arm/v7"
   stage: containerize
   needs:
     - job: build:arm64
