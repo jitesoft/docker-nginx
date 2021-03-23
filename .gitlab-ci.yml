@@ -206,7 +206,7 @@ build:amd64:
 build:arm:
   extends:
     - .build
-    - .buildbase.ppc64le
+    - .buildbase.arm
   tags: [ buildx ]
   variables:
     ARCH: arm
