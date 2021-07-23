@@ -25,6 +25,15 @@ Dockerfile can be found at [GitLab](https://gitlab.com/jitesoft/dockerfiles/ngin
 Most basic usage is to just run the container, nginx will start and serve the content in the /usr/local/nginx/html directory.  
 Port `80` is exposed by default.
 
+### www-data user
+
+The www-data user have the same id as the www-data user in the most common alpine images, 82.  
+Before 2021 07 23, the id was 1000, which created issues with read/write permissions
+when used with the jitesoft/php image.  
+
+Containers created runs as root (easily changed in production with the appropriate flags),
+while the nginx process runs as the www-data user (82) by default.
+
 ### Template
 
 To ease the setup process, the startup script will generate a default.conf file in the /etc/nginx/conf.d directory. Any files in said directory will be
@@ -54,3 +63,21 @@ Nginx is released under [2-clause BSD-like license](https://nginx.org/LICENSE).
 ## Image labels
 
 This image follows the [Jitesoft image label specification 1.0.0](https://gitlab.com/snippets/1866155).
+
+## Sponsors
+
+Sponsoring is vital for the further development and maintaining of open source projects.  
+Questions and sponsoring queries can be made via <a href="mailto:sponsor@jitesoft.com">email</a>.  
+If you wish to sponsor our projects, reach out to the email above or visit any of the following sites:
+
+[Open Collective](https://opencollective.com/jitesoft-open-source)  
+[GitHub Sponsors](https://github.com/sponsors/jitesoft)  
+[Patreon](https://www.patreon.com/jitesoft)
+
+Jitesoft images are built via GitLab CI on runners hosted by the following wonderful organisations:
+
+<a href="https://fosshost.org/">
+  <img src="https://raw.githubusercontent.com/jitesoft/misc/master/sponsors/fosshost.png" width="256" alt="Fosshost logo" />
+</a>
+
+_The companies above are not affiliated with Jitesoft or any Jitesoft Projects directly._
