@@ -12,12 +12,13 @@ LABEL maintainer="Johannes Tegnér <johannes@jitesoft.com>" \
 
 ENV PORT="80"
 ARG TARGETARCH
+ARG WWWDATA_GUID="82"
+ENV WWWDATA_GUID="${WWWDATA_GUID}"
 
 RUN --mount=type=bind,source=./binaries,target=/tmp/bin \
     tar -xzhf /tmp/bin/nginx-${TARGETARCH}.tar.gz -C /usr/local \
  && cp /tmp/bin/default.template /usr/local/default.template \
- && addgroup -g 1000 www-data \
- && adduser -u 1000 -G www-data -s /bin/sh -D www-data \
+ && adduser -u ${WWWDATA_GUID} -G www-data -s /bin/sh -D www-data \
  && mkdir -p /etc/nginx/conf.d /var/log/nginx /usr/local/nginx/html \
  && tar -xzhf /tmp/bin/nginx-conf-${TARGETARCH}.tar.gz -C /etc/nginx \
  && cp /tmp/bin/nginx.conf /etc/nginx/nginx.conf \
