@@ -1,7 +1,7 @@
 include:
   - file: /Scan/trivy.yml
     project: jitesoft/gitlab-ci-lib
-  - file: /OCI/arch-image.yml
+  - file: /OCI/buildbase.yml
     project: jitesoft/gitlab-ci-lib
 
 stages:
@@ -206,7 +206,7 @@ build:amd64:
 build:arm:
   extends:
     - .build
-    - .buildbase.arm
+    - .buildbase.3.16.arm
   tags: [ buildx ]
   variables:
     ARCH: arm
@@ -214,7 +214,7 @@ build:arm:
 build:s390x:
   extends:
     - .build
-    - .buildbase.s390x
+    - .buildbase.3.16.s390x
   tags: [ buildx ]
   variables:
     ARCH: s390x
@@ -222,7 +222,7 @@ build:s390x:
 build:i386:
   extends:
     - .build
-    - .buildbase.386
+    - .buildbase.3.16.386
   tags: [ buildx ]
   variables:
     ARCH: 386
@@ -230,7 +230,7 @@ build:i386:
 build:ppc64le:
   extends:
     - .build
-    - .buildbase.ppc64le
+    - .buildbase.3.16.ppc64le
   tags: [ buildx ]
   variables:
     ARCH: ppc64le
