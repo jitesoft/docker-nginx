@@ -8,7 +8,17 @@ LABEL maintainer="Johannes Tegnér <johannes@jitesoft.com>" \
       com.jitesoft.project.repo.uri="https://gitlab.com/jitesoft/dockerfiles/nginx" \
       com.jitesoft.project.repo.issues="https://gitlab.com/jitesoft/dockerfiles/nginx/issues" \
       com.jitesoft.project.registry.uri="registry.gitlab.com/jitesoft/dockerfiles/nginx" \
-      com.jitesoft.app.nginx.version="${VERSION}"
+      com.jitesoft.app.nginx.version="${VERSION}" \
+      # Open container labels
+      org.opencontainers.image.version="${VERSION}" \
+      org.opencontainers.image.created="${BUILD_TIME}" \
+      org.opencontainers.image.description="Nginx on Alpine linux" \
+      org.opencontainers.image.vendor="Jitesoft" \
+      org.opencontainers.image.source="https://gitlab.com/jitesoft/dockerfiles/nginx" \
+      # Artifact hub annotations
+      io.artifacthub.package.alternative-locations="oci://index.docker.io/jitesoft/nginx,oci://ghcr.io/jitesoft/nginx,oci://registry.gitlab.com/jitesoft/dockerfiles/nginx" \
+      io.artifacthub.package.readme-url="https://gitlab.com/jitesoft/dockerfiles/nginx/-/raw/master/README.md" \
+      io.artifacthub.package.logo-url="https://jitesoft.com/favicon-96x96.png"
 
 ENV PORT="80"
 ARG TARGETARCH

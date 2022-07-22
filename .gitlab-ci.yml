@@ -264,7 +264,7 @@ containerize:
     - if [  "${TYPE}" == "MAINLINE" ]; then EXTRA_TAGS=",latest"; fi
     - TYPE_TAG=$(echo "${TYPE}" | awk '{print tolower($0)}')
     - TAGS=$(helper "${REGISTRIES}" "${VERSION},${TYPE_TAG}${EXTRA_TAGS}")
-    - docker buildx build --platform ${ARCHS} --push ${TAGS} --progress plain --build-arg VERSION=${VERSION} .
+    - docker buildx build --platform ${ARCHS} --push ${TAGS} --progress plain --build-arg VERSION=${VERSION} --build-arg BUILD_TIME="$(date -Iseconds)" .
     - echo -e "${VERSION}" > ${TYPE}.txt
   tags: [ buildx, protected ]
   cache:
