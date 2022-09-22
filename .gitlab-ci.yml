@@ -115,7 +115,7 @@ download:
       - nginx-*.tar.gz
     expire_in: 1 day
 
-.build:
+build:
   extends: .buildbase_variables
   parallel:
     matrix:
