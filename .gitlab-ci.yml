@@ -116,7 +116,17 @@ download:
     expire_in: 1 day
 
 .build:
-  image: registry.gitlab.com/jitesoft/dockerfiles/misc/buildbase:latest
+  extends: .buildbase_variables
+  parallel:
+    matrix:
+      - { BUILD_IMAGE: "$BUILDBASE_IMAGE_amd64_3_16", TAG: "native-amd64", ARCH: "amd64" }
+      - { BUILD_IMAGE: "$BUILDBASE_IMAGE_arm64_3_16", TAG: "native-aarch64", ARCH: "arm64" }
+      - { BUILD_IMAGE: "$BUILDBASE_IMAGE_arm_3_16", TAG: "buildx", ARCH: "arm" }
+      - { BUILD_IMAGE: "$BUILDBASE_IMAGE_s390x_3_16", TAG: "buildx", ARCH: "s390x" }
+      - { BUILD_IMAGE: "$BUILDBASE_IMAGE_386_3_16", TAG: "buildx", ARCH: "386" }
+      - { BUILD_IMAGE: "$BUILDBASE_IMAGE_ppc64le_3_16", TAG: "buildx", ARCH: "ppc64le" }
+  tags: [ $TAG ]
+  image: $BUILD_IMAGE
   rules:
     - if: "$BUILD"
       when: on_success
@@ -191,50 +201,6 @@ download:
     when: on_success
     expire_in: 1 day
 
-build:arm64:
-  extends: .build
-  tags: [ native-arm64 ]
-  variables:
-    ARCH: arm64
-
-build:amd64:
-  extends: .build
-  tags: [ native-amd64 ]
-  variables:
-    ARCH: amd64
-
-build:arm:
-  extends:
-    - .build
-    - .buildbase.3.16.arm
-  tags: [ buildx ]
-  variables:
-    ARCH: arm
-
-build:s390x:
-  extends:
-    - .build
-    - .buildbase.3.16.s390x
-  tags: [ buildx ]
-  variables:
-    ARCH: s390x
-
-build:i386:
-  extends:
-    - .build
-    - .buildbase.3.16.386
-  tags: [ buildx ]
-  variables:
-    ARCH: 386
-
-build:ppc64le:
-  extends:
-    - .build
-    - .buildbase.3.16.ppc64le
-  tags: [ buildx ]
-  variables:
-    ARCH: ppc64le
-
 containerize:
   image: registry.gitlab.com/jitesoft/dockerfiles/misc:latest
   rules:
@@ -245,17 +211,7 @@ containerize:
     ARCHS: "linux/arm64,linux/amd64,linux/386,linux/ppc64le,linux/s390x,linux/arm/v7"
   stage: containerize
   needs:
-    - job: build:arm64
-      artifacts: true
-    - job: build:amd64
-      artifacts: true
-    - job: build:arm
-      artifacts: true
-    - job: build:s390x
-      artifacts: true
-    - job: build:ppc64le
-      artifacts: true
-    - job: build:i386
+    - job: build
       artifacts: true
   script:
     - touch MAINLINE.txt
