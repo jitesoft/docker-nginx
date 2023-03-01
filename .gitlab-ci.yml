@@ -33,13 +33,13 @@ check:
     - MAINLINE=$(echo $VERSIONS | awk '{print $1}');
     - STABLE=$(echo $VERSIONS | awk '{print $2}');
     - |
-      if [ "${MAINLINE}" != "$(cat MAINLINE.txt)" ] || [ -n "${FORCE_BUILD}" ] ; then
+      if [ ! -z "${FORCE_BUILD+x}" ] || [ "${MAINLINE}" != "$(cat MAINLINE.txt)" ]; then
         curl -F token=${CI_JOB_TOKEN} -F ref=master -F "variables[VERSION]=${MAINLINE}" -F "variables[BUILD]=true" -F "variables[TYPE]=MAINLINE" https://gitlab.com/api/v4/projects/${CI_PROJECT_ID}/trigger/pipeline
       else
         curl -F token=${CI_JOB_TOKEN} -F ref=master -F "variables[VERSION]=${MAINLINE}" -F "variables[SCAN]=true" https://gitlab.com/api/v4/projects/${CI_PROJECT_ID}/trigger/pipeline
       fi
     - |
-      if [ "${STABLE}" != "$(cat STABLE.txt)" ] || [ -n "${FORCE_BUILD}" ]; then
+      if [ ! -z "${FORCE_BUILD+x}" ] || [ "${STABLE}" != "$(cat STABLE.txt)" ]; then
         curl -F token=${CI_JOB_TOKEN} -F ref=master -F "variables[VERSION]=${STABLE}" -F "variables[BUILD]=true" -F "variables[TYPE]=STABLE" https://gitlab.com/api/v4/projects/${CI_PROJECT_ID}/trigger/pipeline
       else
         curl -F token=${CI_JOB_TOKEN} -F ref=master -F "variables[VERSION]=${STABLE}" -F "variables[SCAN]=true" https://gitlab.com/api/v4/projects/${CI_PROJECT_ID}/trigger/pipeline
