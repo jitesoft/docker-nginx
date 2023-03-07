@@ -52,6 +52,7 @@ check:
     policy: pull
 
 scan:
+  stage: scan
   extends: .container_scanning
   rules:
     - if: $SCAN == "true"
