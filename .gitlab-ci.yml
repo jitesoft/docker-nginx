@@ -54,7 +54,7 @@ check:
 scan:
   extends: .container_scanning
   rules:
-    - if: "$SCAN"
+    - if: "$SCAN == true"
       when: always
     - if: "$VERSION"
       when: always
