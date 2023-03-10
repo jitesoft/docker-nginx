@@ -36,7 +36,7 @@ RUN --mount=type=bind,source=./binaries,target=/tmp/bin \
  && chmod +x /usr/local/bin/* \
  && chown -R www-data:www-data /usr/local/nginx \
  && chown -R www-data:www-data /etc/nginx \
- && apk add --no-cache --virtual .runtime-deps openssl openssl1.1-compat pcre zlib libxml2 libxslt gd geoip perl ca-certificates \
+ && apk add --no-cache --virtual .runtime-deps openssl pcre zlib libxml2 libxslt gd geoip perl ca-certificates \
  && nginx -T
 
 WORKDIR /usr/local/nginx/html
