@@ -13,7 +13,7 @@ stages:
   - scan
 
 variables:
-  REGISTRIES: "ghcr.io/jitesoft/nginx,jitesoft/nginx,${CI_REGISTRY_IMAGE}"
+  REGISTRIES: "ghcr.io/jitesoft/nginx,jitesoft/nginx,${CI_REGISTRY_IMAGE},quay.io/jitesoft/nginx"
 
 check:
   image: registry.gitlab.com/jitesoft/dockerfiles/misc:latest
@@ -231,17 +231,17 @@ containerize:
       - STABLE.txt
     key: nginx.versions
 
-push:non-multi-arch:
-  rules:
-    - if: "$BUILD"
-      when: on_success
-    - when: never
-  stage: post
-  image: registry.gitlab.com/jitesoft/dockerfiles/misc:latest
-  script:
-    - TYPE_TAG=$(echo "${TYPE}" | awk '{print tolower($0)}')
-    - docker pull ${CI_REGISTRY_IMAGE}:${TYPE_TAG}
-    - helper multitag ${CI_REGISTRY_IMAGE}:${TYPE_TAG} quay.io/jitesoft/nginx:latest quay.io/jitesoft/nginx:${VERSION} quay.io/jitesoft/nginx:${TYPE_TAG}
-    - helper multipush quay.io/jitesoft/nginx:latest quay.io/jitesoft/nginx:${VERSION} quay.io/jitesoft/nginx:${TYPE_TAG}
-  tags: [ protected, buildx ]
+#push:non-multi-arch:
+#  rules:
+#    - if: "$BUILD"
+#      when: on_success
+#    - when: never
+#  stage: post
+#  image: registry.gitlab.com/jitesoft/dockerfiles/misc:latest
+#  script:
+#    - TYPE_TAG=$(echo "${TYPE}" | awk '{print tolower($0)}')
+#    - docker pull ${CI_REGISTRY_IMAGE}:${TYPE_TAG}
+#    - helper multitag ${CI_REGISTRY_IMAGE}:${TYPE_TAG} quay.io/jitesoft/nginx:latest quay.io/jitesoft/nginx:${VERSION} quay.io/jitesoft/nginx:${TYPE_TAG}
+#    - helper multipush quay.io/jitesoft/nginx:latest quay.io/jitesoft/nginx:${VERSION} quay.io/jitesoft/nginx:${TYPE_TAG}
+#  tags: [ protected, buildx ]
 
