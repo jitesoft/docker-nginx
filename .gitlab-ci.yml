@@ -19,7 +19,7 @@ variables:
   REGISTRIES: "ghcr.io/jitesoft/nginx,jitesoft/nginx,${CI_REGISTRY_IMAGE},quay.io/jitesoft/nginx"
 
 update-readme:
-  stage: check
+  stage: pre
   extends: .readme-check
   parallel:
     matrix:
