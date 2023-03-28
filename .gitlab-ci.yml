@@ -1,3 +1,7 @@
+workflow:
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+
 include:
   - file: /Scan/trivy.yml
     project: jitesoft/gitlab-ci-lib
