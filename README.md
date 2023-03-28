@@ -9,7 +9,7 @@ Nginx running on alpine linux.
 
 The image is built automatically via CI, using latest alpine as base image.
 
-Images can be found at:
+Images can be found at:  
 
 * [Docker hub](https://hub.docker.com/r/jitesoft/nginx): `jitesoft/nginx`  
 * [GitLab](https://gitlab.com/jitesoft/dockerfiles/nginx): `registry.gitlab.com/jitesoft/dockerfiles/nginx`
@@ -54,30 +54,31 @@ It's possible to turn the healthcheck off by setting `SKIP_HEALTHCHECK=true` as 
   
 Changing the healthcheck scripts is possible, while not recommended.
 
-## Licenses
-
-Dockerfiles and other scripts in the repository is released under the [MIT license](https://gitlab.com/jitesoft/dockerfiles/nginx/blob/master/LICENSE)
-
-Nginx is released under [2-clause BSD-like license](https://nginx.org/LICENSE).
-
 ## Image labels
 
 This image follows the [Jitesoft image label specification 1.0.0](https://gitlab.com/snippets/1866155).
 
+## Licenses
+
+Files in this repository are released under the MIT license.  
+Nginx is released under [2-clause BSD-like license](https://nginx.org/LICENSE).
+
 ## Sponsors
 
-Sponsoring is vital for the further development and maintaining of open source projects.  
-Questions and sponsoring queries can be made via <a href="mailto:sponsor@jitesoft.com">email</a>.  
+Jitesoft images are built via GitLab CI on runners hosted by the following wonderful organisations:
+
+<a href="https://osuosl.org/" target="_blank" title="Oregon State University - Open Source Lab">
+    <img src="https://jitesoft.com/images/oslx128.webp" alt="Oregon State University - Open Source Lab">
+</a>
+
+_The companies above are not affiliated with Jitesoft or any Jitesoft Projects directly._
+
+---
+
+Sponsoring is vital for the further development and maintaining of open source.  
+Questions and sponsoring queries can be made by <a href="mailto:sponsor@jitesoft.com">email</a>.  
 If you wish to sponsor our projects, reach out to the email above or visit any of the following sites:
 
 [Open Collective](https://opencollective.com/jitesoft-open-source)  
 [GitHub Sponsors](https://github.com/sponsors/jitesoft)  
 [Patreon](https://www.patreon.com/jitesoft)
-
-Jitesoft images are built via GitLab CI on runners hosted by the following wonderful organisations:
-
-<a href="https://fosshost.org/">
-  <img src="https://raw.githubusercontent.com/jitesoft/misc/master/sponsors/fosshost.png" width="256" alt="Fosshost logo" />
-</a>
-
-_The companies above are not affiliated with Jitesoft or any Jitesoft Projects directly._
