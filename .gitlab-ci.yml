@@ -3,8 +3,11 @@ include:
     project: jitesoft/gitlab-ci-lib
   - file: /OCI/buildbase.yml
     project: jitesoft/gitlab-ci-lib
+  - file: /OCI/push-readme.yml
+    project: jitesoft/gitlab-ci-lib
 
 stages:
+  - readme
   - pre
   - download
   - build
@@ -14,6 +17,15 @@ stages:
 
 variables:
   REGISTRIES: "ghcr.io/jitesoft/nginx,jitesoft/nginx,${CI_REGISTRY_IMAGE},quay.io/jitesoft/nginx"
+
+update-readme:
+  stage: check
+  extends: .readme-check
+  parallel:
+    matrix:
+      - { PUSHRM_TARGET: "quay.io/jitesoft/nginx" }
+      - { PUSHRM_TARGET: "docker.io/jitesoft/nginx" }
+  tags: [ protected ]
 
 check:
   image: registry.gitlab.com/jitesoft/dockerfiles/misc:latest
