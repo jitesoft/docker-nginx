@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:experimental
-FROM registry.gitlab.com/jitesoft/dockerfiles/alpine:3.16
+FROM registry.gitlab.com/jitesoft/dockerfiles/alpine:3.20
 ARG VERSION
 LABEL maintainer="Johannes Tegnér <johannes@jitesoft.com>" \
       maintainer.org="Jitesoft" \
