@@ -137,12 +137,12 @@ build:
   extends: .buildbase_variables
   parallel:
     matrix:
-      - { BUILD_IMAGE: "$BUILDBASE_IMAGE_amd64_3_16", TAG: "native-amd64", ARCH: "amd64" }
-      - { BUILD_IMAGE: "$BUILDBASE_IMAGE_arm64_3_16", TAG: "native-aarch64", ARCH: "arm64" }
-      - { BUILD_IMAGE: "$BUILDBASE_IMAGE_arm_3_16", TAG: "buildx", ARCH: "arm" }
-      - { BUILD_IMAGE: "$BUILDBASE_IMAGE_s390x_3_16", TAG: "buildx", ARCH: "s390x" }
-      - { BUILD_IMAGE: "$BUILDBASE_IMAGE_386_3_16", TAG: "buildx", ARCH: "386" }
-      - { BUILD_IMAGE: "$BUILDBASE_IMAGE_ppc64le_3_16", TAG: "buildx", ARCH: "ppc64le" }
+      - { BUILD_IMAGE: "$BUILDBASE_IMAGE_amd64_3_20", TAG: "native-amd64", ARCH: "amd64" }
+      - { BUILD_IMAGE: "$BUILDBASE_IMAGE_arm64_3_20", TAG: "native-aarch64", ARCH: "arm64" }
+      - { BUILD_IMAGE: "$BUILDBASE_IMAGE_arm_3_20", TAG: "buildx", ARCH: "arm" }
+      - { BUILD_IMAGE: "$BUILDBASE_IMAGE_s390x_3_20", TAG: "buildx", ARCH: "s390x" }
+      - { BUILD_IMAGE: "$BUILDBASE_IMAGE_386_3_20", TAG: "buildx", ARCH: "386" }
+      - { BUILD_IMAGE: "$BUILDBASE_IMAGE_ppc64le_3_20", TAG: "buildx", ARCH: "ppc64le" }
   tags: [ $TAG ]
   image: $BUILD_IMAGE
   rules:
@@ -247,18 +247,4 @@ containerize:
       - MAINLINE.txt
       - STABLE.txt
     key: nginx.versions
-
-#push:non-multi-arch:
-#  rules:
-#    - if: "$BUILD"
-#      when: on_success
-#    - when: never
-#  stage: post
-#  image: registry.gitlab.com/jitesoft/dockerfiles/misc:latest
-#  script:
-#    - TYPE_TAG=$(echo "${TYPE}" | awk '{print tolower($0)}')
-#    - docker pull ${CI_REGISTRY_IMAGE}:${TYPE_TAG}
-#    - helper multitag ${CI_REGISTRY_IMAGE}:${TYPE_TAG} quay.io/jitesoft/nginx:latest quay.io/jitesoft/nginx:${VERSION} quay.io/jitesoft/nginx:${TYPE_TAG}
-#    - helper multipush quay.io/jitesoft/nginx:latest quay.io/jitesoft/nginx:${VERSION} quay.io/jitesoft/nginx:${TYPE_TAG}
-#  tags: [ protected, buildx ]
 
