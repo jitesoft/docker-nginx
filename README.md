@@ -5,6 +5,10 @@
 
 Nginx running on alpine linux.
 
+### Notice
+
+Due to a currently unresolved issue with the x390s and ppc64 builds, images for those two architectures have been paused.
+
 ## Tags
 
 The image is built automatically via CI, using latest alpine as base image.

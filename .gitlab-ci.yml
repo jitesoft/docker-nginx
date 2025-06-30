@@ -140,9 +140,9 @@ build:
       - { BUILD_IMAGE: "$BUILDBASE_IMAGE_amd64_3_22", TAG: "native-amd64", ARCH: "amd64" }
       - { BUILD_IMAGE: "$BUILDBASE_IMAGE_arm64_3_22", TAG: "native-aarch64", ARCH: "arm64" }
       - { BUILD_IMAGE: "$BUILDBASE_IMAGE_arm_3_22", TAG: "buildx", ARCH: "arm" }
-      - { BUILD_IMAGE: "$BUILDBASE_IMAGE_s390x_3_22", TAG: "buildx", ARCH: "s390x" }
+#      - { BUILD_IMAGE: "$BUILDBASE_IMAGE_s390x_3_22", TAG: "buildx", ARCH: "s390x" }
       - { BUILD_IMAGE: "$BUILDBASE_IMAGE_386_3_22", TAG: "buildx", ARCH: "386" }
-      - { BUILD_IMAGE: "$BUILDBASE_IMAGE_ppc64le_3_22", TAG: "buildx", ARCH: "ppc64le" }
+#      - { BUILD_IMAGE: "$BUILDBASE_IMAGE_ppc64le_3_22", TAG: "buildx", ARCH: "ppc64le" }
   tags: [ $TAG ]
   image: $BUILD_IMAGE
   rules:
@@ -226,7 +226,8 @@ containerize:
       when: on_success
     - when: never
   variables:
-    ARCHS: "linux/arm64,linux/amd64,linux/386,linux/ppc64le,linux/s390x,linux/arm/v7"
+    ARCHS: "linux/arm64,linux/amd64,linux/386,linux/arm/v7"
+# linux/ppc64le,linux/s390x,
   stage: containerize
   needs:
     - job: build
