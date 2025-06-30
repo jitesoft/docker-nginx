@@ -160,8 +160,8 @@ build:
     - mkdir -p ${CI_PROJECT_DIR}/src
     - export CCACHE_DIR="${CI_PROJECT_DIR}/ccache"
     - ccache -s
-    - export CPPFLAGS="${CPPFLAGS} -fstack-protector-strong -fpic -fpie -O2"
-    - export CFLAGS="${CFLAGS} -fstack-protector-strong -fpic -fpie -O2"
+    - export CPPFLAGS="-fstack-protector-strong -fpic -fpie -O2"
+    - export CFLAGS="-fstack-protector-strong -fpic -fpie -O2"
     - tar -xzf nginx-${TYPE}.tar.gz -C src --strip-components=1
   script:
     - addgroup -g 1000 www-data && adduser -u 1000 -G www-data -s /bin/sh -D www-data
