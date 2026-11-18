@@ -137,11 +137,11 @@ build:
   extends: .buildbase_variables
   parallel:
     matrix:
-      - { BUILD_IMAGE: "$BUILDBASE_IMAGE_amd64_3_23", TAG: "native-amd64", ARCH: "amd64" }
-      - { BUILD_IMAGE: "$BUILDBASE_IMAGE_arm64_3_23", TAG: "native-aarch64", ARCH: "arm64" }
-      - { BUILD_IMAGE: "$BUILDBASE_IMAGE_arm_3_23", TAG: "buildx", ARCH: "arm" }
+      - { BUILD_IMAGE: "$BUILDBASE_IMAGE_amd64_3_24", TAG: "native-amd64", ARCH: "amd64" }
+      - { BUILD_IMAGE: "$BUILDBASE_IMAGE_arm64_3_24", TAG: "native-aarch64", ARCH: "arm64" }
+      - { BUILD_IMAGE: "$BUILDBASE_IMAGE_arm_3_24", TAG: "buildx", ARCH: "arm" }
 #      - { BUILD_IMAGE: "$BUILDBASE_IMAGE_s390x_3_22", TAG: "buildx", ARCH: "s390x" }
-      - { BUILD_IMAGE: "$BUILDBASE_IMAGE_386_3_23", TAG: "buildx", ARCH: "386" }
+      - { BUILD_IMAGE: "$BUILDBASE_IMAGE_386_3_24", TAG: "buildx", ARCH: "386" }
 #      - { BUILD_IMAGE: "$BUILDBASE_IMAGE_ppc64le_3_22", TAG: "buildx", ARCH: "ppc64le" }
   tags: [ $TAG ]
   image: $BUILD_IMAGE
@@ -182,6 +182,7 @@ build:
         --with-http_perl_module \
         --with-http_realip_module \
         --with-http_ssl_module \
+        --with-http2_v2_module \
         --with-http_stub_status_module \
         --with-http_sub_module \
         --with-http_xslt_module \
